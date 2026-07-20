@@ -1,0 +1,146 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;600&family=Fraunces:opsz,wght@9..144,300;400;500;600&family=Cairo:wght@400;500;600;700&display=swap');
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@plugin "@tailwindcss/typography";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-card-border: hsl(var(--card-border));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-popover-border: hsl(var(--popover-border));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  --color-chart-1: hsl(var(--chart-1));
+  --color-chart-2: hsl(var(--chart-2));
+  --color-chart-3: hsl(var(--chart-3));
+  --color-chart-4: hsl(var(--chart-4));
+  --color-chart-5: hsl(var(--chart-5));
+
+  --font-sans: 'DM Sans', sans-serif;
+  --font-serif: 'Fraunces', serif;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --background: 36 33% 97%; /* Cream #F9F6F0 */
+  --foreground: 150 25% 15%; /* Deep Forest #1D3025 */
+  
+  --card: 0 0% 100%;
+  --card-foreground: 150 25% 15%;
+  --card-border: 106 15% 90%;
+  
+  --popover: 0 0% 100%;
+  --popover-foreground: 150 25% 15%;
+  --popover-border: 106 15% 90%;
+  
+  --primary: 106 19% 46%; /* Sage Green */
+  --primary-foreground: 0 0% 100%;
+  
+  --secondary: 35 60% 55%; /* Warm Amber */
+  --secondary-foreground: 0 0% 100%;
+  
+  --muted: 106 10% 90%; /* Soft light sage */
+  --muted-foreground: 150 15% 40%;
+  
+  --accent: 35 60% 55%;
+  --accent-foreground: 0 0% 100%;
+  
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  
+  --border: 106 15% 85%;
+  --input: 106 15% 85%;
+  --ring: 106 19% 46%;
+  
+  --radius: 1rem;
+  
+  --chart-1: 106 19% 46%; /* Sage */
+  --chart-2: 35 60% 55%; /* Amber */
+  --chart-3: 150 25% 25%; /* Forest */
+  --chart-4: 36 33% 85%; /* Cream shadow */
+  --chart-5: 20 40% 60%; /* Terracotta */
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 4px 14px 0 rgb(29 48 37 / 0.08);
+  --shadow-md: 0 10px 25px -3px rgb(29 48 37 / 0.1), 0 4px 6px -4px rgb(29 48 37 / 0.05);
+  --shadow-lg: 0 20px 40px -5px rgb(29 48 37 / 0.1), 0 8px 10px -6px rgb(29 48 37 / 0.05);
+}
+
+.dark {
+  --background: 150 25% 10%; /* Dark Forest */
+  --foreground: 36 33% 97%;
+  
+  --card: 150 25% 13%;
+  --card-foreground: 36 33% 97%;
+  --card-border: 150 25% 20%;
+  
+  --popover: 150 25% 13%;
+  --popover-foreground: 36 33% 97%;
+  --popover-border: 150 25% 20%;
+  
+  --primary: 106 19% 56%; 
+  --primary-foreground: 150 25% 10%;
+  
+  --secondary: 35 60% 65%;
+  --secondary-foreground: 150 25% 10%;
+  
+  --muted: 150 25% 20%;
+  --muted-foreground: 106 10% 70%;
+  
+  --accent: 35 60% 65%;
+  --accent-foreground: 150 25% 10%;
+  
+  --destructive: 0 60% 50%;
+  --destructive-foreground: 36 33% 97%;
+  
+  --border: 150 25% 20%;
+  --input: 150 25% 20%;
+  --ring: 106 19% 56%;
+  
+  --chart-1: 106 19% 56%;
+  --chart-2: 35 60% 65%;
+  --chart-3: 150 25% 45%;
+  --chart-4: 36 33% 35%;
+  --chart-5: 20 40% 70%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif tracking-tight text-foreground;
+  }
+}
