@@ -1,4 +1,4 @@
-import { Router, type IRouter } from "express";
+import { Router } from "express";
 import {
   getAllAssessments,
   getAllAssessmentsSortedByDateDesc,
@@ -18,7 +18,7 @@ import {
   DeleteAdminAssessmentParams,
 } from "@workspace/api-zod";
 
-const router: IRouter = Router();
+const router = Router();
 
 const ADMIN_PASSWORD =
   process.env["ADMIN_PASSWORD"] ?? "purebotanica2024";

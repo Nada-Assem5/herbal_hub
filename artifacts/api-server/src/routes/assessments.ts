@@ -1,4 +1,4 @@
-import { Router, type IRouter } from "express";
+import { Router } from "express";
 import { insertAssessment, getAssessmentById } from "@workspace/db";
 import {
   SubmitAssessmentBody,
@@ -8,7 +8,7 @@ import {
 } from "@workspace/api-zod";
 import { score } from "../lib/scoring.js";
 
-const router: IRouter = Router();
+const router = Router();
 
 router.post("/assessments", async (req, res): Promise<void> => {
   const parsed = SubmitAssessmentBody.safeParse(req.body);

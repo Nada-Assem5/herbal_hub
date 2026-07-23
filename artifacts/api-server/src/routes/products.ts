@@ -1,7 +1,7 @@
-import { Router, type IRouter } from "express";
+import { Router } from "express";
 import { getProducts } from "@workspace/db";
 
-const router: IRouter = Router();
+const router = Router();
 
 router.get("/products", async (_req, res): Promise<void> => {
   const products = await getProducts();
