@@ -72,9 +72,9 @@ router.get("/admin/stats", requireAdmin, async (req: any, res: any): Promise<voi
   const all = await getAllAssessments();
 
   const totalAssessments = all.length;
-  const focusCount = all.filter((a) => a.recommendation === "focus").length;
-  const mineralCount = all.filter((a) => a.recommendation === "mineral").length;
-  const bothCount = all.filter((a) => a.recommendation === "both").length;
+  const focusCount = all.filter((a: any) => a.recommendation === "focus").length;
+  const mineralCount = all.filter((a: any) => a.recommendation === "mineral").length;
+  const bothCount = all.filter((a: any) => a.recommendation === "both").length;
 
   // Age distribution
   const ageCounts: Record<number, number> = {};
@@ -211,7 +211,7 @@ router.get(
       "Created At",
     ];
 
-    const csvRows = rows.map((r) => [
+    const csvRows = rows.map((r: any) => [
       r.id,
       r.parentName,
       r.email,
