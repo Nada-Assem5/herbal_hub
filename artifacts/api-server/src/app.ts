@@ -2,8 +2,8 @@ import express from "express";
 import cors from "cors";
 import pinoHttp from "pino-http";
 import session from "express-session";
-import router from "./routes/index.js";
-import { logger } from "./lib/logger.js";
+import router from "./routes/index";
+import { logger } from "./lib/logger";
 
 const app: any = express();
 

@@ -1,8 +1,8 @@
 import { Router } from "express";
-import healthRouter from "./health.js";
-import assessmentsRouter from "./assessments.js";
-import adminRouter from "./admin/index.js";
-import productsRouter from "./products.js";
+import healthRouter from "./health";
+import assessmentsRouter from "./assessments";
+import adminRouter from "./admin/index";
+import productsRouter from "./products";
 
 const router = Router();
 

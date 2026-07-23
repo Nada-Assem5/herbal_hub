@@ -6,7 +6,7 @@ import {
   GetAssessmentParams,
   GetAssessmentResponse,
 } from "@workspace/api-zod";
-import { score } from "../lib/scoring.js";
+import { score } from "../lib/scoring";
 
 const router = Router();
 
