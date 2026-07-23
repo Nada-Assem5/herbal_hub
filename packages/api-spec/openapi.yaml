@@ -1,0 +1,476 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: Pure Botanica API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: assessments
+    description: Assessment submissions
+  - name: admin
+    description: Admin operations
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /assessments:
+    post:
+      operationId: submitAssessment
+      tags: [assessments]
+      summary: Submit a new assessment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssessmentInput"
+      responses:
+        "201":
+          description: Assessment created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssessmentResult"
+        "400":
+          description: Validation error
+
+  /assessments/{id}:
+    get:
+      operationId: getAssessment
+      tags: [assessments]
+      summary: Get assessment result by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Assessment result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssessmentResult"
+        "404":
+          description: Not found
+
+  /admin/login:
+    post:
+      operationId: adminLogin
+      tags: [admin]
+      summary: Admin login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminCredentials"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminMeResponse"
+        "401":
+          description: Invalid credentials
+
+  /admin/logout:
+    post:
+      operationId: adminLogout
+      tags: [admin]
+      summary: Admin logout
+      responses:
+        "200":
+          description: Logged out
+
+  /admin/me:
+    get:
+      operationId: getAdminMe
+      tags: [admin]
+      summary: Get current admin session
+      responses:
+        "200":
+          description: Authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminMeResponse"
+        "401":
+          description: Not authenticated
+
+  /admin/stats:
+    get:
+      operationId: getAdminStats
+      tags: [admin]
+      summary: Get dashboard statistics
+      responses:
+        "200":
+          description: Dashboard stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminStats"
+        "401":
+          description: Not authenticated
+
+  /admin/assessments:
+    get:
+      operationId: listAdminAssessments
+      tags: [admin]
+      summary: List all assessments
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: recommendation
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of assessments
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssessmentListResponse"
+        "401":
+          description: Not authenticated
+
+  /admin/assessments/{id}:
+    get:
+      operationId: getAdminAssessment
+      tags: [admin]
+      summary: Get assessment detail (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Assessment detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssessmentResult"
+        "401":
+          description: Not authenticated
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteAdminAssessment
+      tags: [admin]
+      summary: Delete an assessment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          description: Not authenticated
+        "404":
+          description: Not found
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+
+    AssessmentInput:
+      type: object
+      required:
+        - parentName
+        - email
+        - childName
+        - age
+        - gender
+        - activityLevel
+        - focusDifficulty
+        - hyperactivity
+        - homework
+        - diet
+        - vegetables
+        - supplements
+      properties:
+        parentName:
+          type: string
+        email:
+          type: string
+        phone:
+          type: ["string", "null"]
+        childName:
+          type: string
+        age:
+          type: integer
+          minimum: 3
+          maximum: 12
+        gender:
+          type: string
+          enum: [male, female, other]
+        activityLevel:
+          type: string
+          enum: [calm, average, very_active]
+        focusDifficulty:
+          type: string
+          enum: [never, sometimes, often]
+        hyperactivity:
+          type: string
+          enum: [never, sometimes, often]
+        homework:
+          type: string
+          enum: [yes, sometimes, no]
+        diet:
+          type: string
+          enum: [excellent, good, average, poor]
+        vegetables:
+          type: string
+          enum: ["0", "1", "2+", "3+"]
+        supplements:
+          type: string
+          enum: [yes, no]
+        allergies:
+          type: ["string", "null"]
+        medications:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+
+    AssessmentResult:
+      type: object
+      required:
+        - id
+        - parentName
+        - email
+        - childName
+        - age
+        - gender
+        - activityLevel
+        - focusDifficulty
+        - hyperactivity
+        - homework
+        - diet
+        - vegetables
+        - supplements
+        - focusScore
+        - mineralScore
+        - recommendation
+        - createdAt
+      properties:
+        id:
+          type: integer
+        parentName:
+          type: string
+        email:
+          type: string
+        phone:
+          type: ["string", "null"]
+        childName:
+          type: string
+        age:
+          type: integer
+        gender:
+          type: string
+        activityLevel:
+          type: string
+        focusDifficulty:
+          type: string
+        hyperactivity:
+          type: string
+        homework:
+          type: string
+        diet:
+          type: string
+        vegetables:
+          type: string
+        supplements:
+          type: string
+        allergies:
+          type: ["string", "null"]
+        medications:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+        focusScore:
+          type: integer
+        mineralScore:
+          type: integer
+        recommendation:
+          type: string
+          enum: [focus, mineral, both]
+        createdAt:
+          type: string
+          format: date-time
+
+    AssessmentListItem:
+      type: object
+      required:
+        - id
+        - parentName
+        - email
+        - childName
+        - age
+        - gender
+        - recommendation
+        - focusScore
+        - mineralScore
+        - createdAt
+      properties:
+        id:
+          type: integer
+        parentName:
+          type: string
+        email:
+          type: string
+        childName:
+          type: string
+        age:
+          type: integer
+        gender:
+          type: string
+        recommendation:
+          type: string
+        focusScore:
+          type: integer
+        mineralScore:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+
+    AssessmentListResponse:
+      type: object
+      required: [data, total, page, limit]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/AssessmentListItem"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+
+    AdminCredentials:
+      type: object
+      required: [password]
+      properties:
+        password:
+          type: string
+
+    AdminMeResponse:
+      type: object
+      required: [authenticated]
+      properties:
+        authenticated:
+          type: boolean
+
+    AgeDistItem:
+      type: object
+      required: [age, count]
+      properties:
+        age:
+          type: integer
+        count:
+          type: integer
+
+    GenderDistItem:
+      type: object
+      required: [gender, count]
+      properties:
+        gender:
+          type: string
+        count:
+          type: integer
+
+    RecommendationDistItem:
+      type: object
+      required: [recommendation, count]
+      properties:
+        recommendation:
+          type: string
+        count:
+          type: integer
+
+    SymptomItem:
+      type: object
+      required: [symptom, count]
+      properties:
+        symptom:
+          type: string
+        count:
+          type: integer
+
+    AdminStats:
+      type: object
+      required:
+        - totalAssessments
+        - focusCount
+        - mineralCount
+        - bothCount
+        - ageDistribution
+        - genderDistribution
+        - recommendationDistribution
+        - commonSymptoms
+      properties:
+        totalAssessments:
+          type: integer
+        focusCount:
+          type: integer
+        mineralCount:
+          type: integer
+        bothCount:
+          type: integer
+        ageDistribution:
+          type: array
+          items:
+            $ref: "#/components/schemas/AgeDistItem"
+        genderDistribution:
+          type: array
+          items:
+            $ref: "#/components/schemas/GenderDistItem"
+        recommendationDistribution:
+          type: array
+          items:
+            $ref: "#/components/schemas/RecommendationDistItem"
+        commonSymptoms:
+          type: array
+          items:
+            $ref: "#/components/schemas/SymptomItem"
