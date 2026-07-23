@@ -1,0 +1,10 @@
+{
+  "buildCommand": "pnpm --filter @workspace/pure-botanica build",
+  "outputDirectory": "artifacts/pure-botanica/dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
