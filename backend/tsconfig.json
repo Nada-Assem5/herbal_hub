@@ -3,16 +3,17 @@
   "compilerOptions": {
     "moduleResolution": "node16",
     "module": "node16",
+    "noEmitOnError": false,
     "incremental": true,
     "tsBuildInfoFile": ".tsbuildinfo",
     "outDir": "dist",
-    "rootDir": "src",
     "types": [
       "node"
     ]
   },
   "include": [
-    "src"
+    "src",
+    "api"
   ],
   "references": [
     {
