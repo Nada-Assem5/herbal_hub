@@ -26,7 +26,7 @@ const ADMIN_PASSWORD =
 // ── Auth middleware ──────────────────────────────────────────────────────────
 
 function requireAdmin(
-  req: Parameters<typeof router.use>[0] extends never ? never : any,
+  req: any,
   res: any,
   next: any,
 ) {
@@ -39,7 +39,7 @@ function requireAdmin(
 
 // ── Auth routes ──────────────────────────────────────────────────────────────
 
-router.post("/admin/login", async (req, res): Promise<void> => {
+router.post("/admin/login", async (req: any, res: any): Promise<void> => {
   const parsed = AdminLoginBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -55,20 +55,20 @@ router.post("/admin/login", async (req, res): Promise<void> => {
   res.json(AdminLoginResponse.parse({ authenticated: true }));
 });
 
-router.post("/admin/logout", (req, res): void => {
+router.post("/admin/logout", (req: any, res: any): void => {
   req.session.destroy(() => {
     res.json({ authenticated: false });
   });
 });
 
-router.get("/admin/me", (req, res): void => {
+router.get("/admin/me", (req: any, res: any): void => {
   const authenticated = (req.session as any)?.isAdmin === true;
   res.json(GetAdminMeResponse.parse({ authenticated }));
 });
 
 // ── Protected routes ─────────────────────────────────────────────────────────
 
-router.get("/admin/stats", requireAdmin, async (req, res): Promise<void> => {
+router.get("/admin/stats", requireAdmin, async (req: any, res: any): Promise<void> => {
   const all = await getAllAssessments();
 
   const totalAssessments = all.length;
@@ -153,7 +153,7 @@ router.get("/admin/stats", requireAdmin, async (req, res): Promise<void> => {
 router.get(
   "/admin/assessments",
   requireAdmin,
-  async (req, res): Promise<void> => {
+  async (req: any, res: any): Promise<void> => {
     const qp = ListAdminAssessmentsQueryParams.safeParse(req.query);
     if (!qp.success) {
       res.status(400).json({ error: qp.error.message });
@@ -161,7 +161,6 @@ router.get(
     }
 
     const { search, recommendation, page = 1, limit = 20 } = qp.data;
-    const offset = (page - 1) * limit;
 
     const { total, rows } = await listAssessments({
       search,
@@ -184,7 +183,7 @@ router.get(
 router.get(
   "/admin/assessments/export",
   requireAdmin,
-  async (req, res): Promise<void> => {
+  async (req: any, res: any): Promise<void> => {
     const format = req.query["format"] === "xlsx" ? "xlsx" : "csv";
     const rows = await getAllAssessmentsSortedByDateDesc();
 
@@ -264,7 +263,7 @@ router.get(
 router.get(
   "/admin/assessments/:id",
   requireAdmin,
-  async (req, res): Promise<void> => {
+  async (req: any, res: any): Promise<void> => {
     const params = GetAdminAssessmentParams.safeParse(req.params);
     if (!params.success) {
       res.status(400).json({ error: params.error.message });
@@ -285,7 +284,7 @@ router.get(
 router.delete(
   "/admin/assessments/:id",
   requireAdmin,
-  async (req, res): Promise<void> => {
+  async (req: any, res: any): Promise<void> => {
     const params = DeleteAdminAssessmentParams.safeParse(req.params);
     if (!params.success) {
       res.status(400).json({ error: params.error.message });
