@@ -9,18 +9,17 @@ A full-stack herbal gummies brand website that helps parents find the right bota
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string (auto-provisioned)
 - Required env: `SESSION_SECRET` — session encryption key (set as Replit secret)
 - Optional env: `ADMIN_PASSWORD` — admin dashboard password (default: `purebotanica2024`)
+- Optional env: `JSON_DB_PATH` — path to local JSON database file (default: `./db.json`)
 
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
 - Frontend: React + Vite, wouter, Tailwind CSS, shadcn/ui, Framer Motion, Recharts
 - API: Express 5 + express-session
-- DB: PostgreSQL + Drizzle ORM (single `assessments` table — flat model)
-- Validation: Zod (`zod/v4`), `drizzle-zod`
+- DB: Direct local JSON file storage (single flat file model)
+- Validation: Zod (`zod/v4`)
 - API codegen: Orval (from OpenAPI spec)
 
 ## Where things live

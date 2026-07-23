@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useLocation } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
@@ -17,6 +17,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { useSubmitAssessment } from '@workspace/api-client-react';
+import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
 import botanicalBg from '@assets/generated_images/botanical-bg.png';
 import { useLang } from '@/lib/lang-context';
@@ -25,6 +26,7 @@ const assessmentSchema = z.object({
   parentName: z.string().min(2),
   email: z.string().email(),
   phone: z.string().optional(),
+  isParent: z.boolean(),
   childName: z.string().min(2),
   age: z.coerce.number().min(3).max(12),
   gender: z.enum(['male', 'female', 'other'], { required_error: 'required' }),
@@ -43,7 +45,7 @@ const assessmentSchema = z.object({
 type AssessmentFormValues = z.infer<typeof assessmentSchema>;
 
 const defaultValues: Partial<AssessmentFormValues> = {
-  parentName: '', email: '', phone: '', childName: '',
+  parentName: '', email: '', phone: '', isParent: false, childName: '',
   age: undefined, gender: undefined, activityLevel: undefined,
   focusDifficulty: undefined, hyperactivity: undefined, homework: undefined,
   diet: undefined, vegetables: undefined, supplements: undefined,
@@ -52,6 +54,7 @@ const defaultValues: Partial<AssessmentFormValues> = {
 
 export function Assessment() {
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
   const submitAssessment = useSubmitAssessment();
   const { t, isRTL } = useLang();
@@ -68,8 +71,33 @@ export function Assessment() {
     return defaultValues;
   })();
 
+  const currentLang = t.lang || 'en';
+  const dynamicSchema = useMemo(() => z.object({
+    parentName: z.string().min(2, { message: currentLang === 'ar' ? 'الاسم يجب أن يكون ثنائياً على الأقل' : 'Name must be at least 2 characters.' }),
+    email: z.string().email({ message: currentLang === 'ar' ? 'البريد الإلكتروني غير صحيح' : 'Invalid email address.' }),
+    phone: z.string().optional(),
+    isParent: z.boolean().refine(val => val === true, {
+      message: currentLang === 'ar' ? 'يجب تأكيد أنك الوالد أو ولي الأمر' : 'You must confirm that you are the parent or guardian.'
+    }),
+    childName: z.string().min(2, { message: currentLang === 'ar' ? 'الاسم يجب أن يكون ثنائياً على الأقل' : 'Name must be at least 2 characters.' }),
+    age: z.coerce.number()
+      .min(3, { message: t.assessment.ageError })
+      .max(12, { message: t.assessment.ageError }),
+    gender: z.enum(['male', 'female', 'other'], { required_error: currentLang === 'ar' ? 'مطلوب' : 'Required' }),
+    activityLevel: z.enum(['calm', 'average', 'very_active'], { required_error: currentLang === 'ar' ? 'مطلوب' : 'Required' }),
+    focusDifficulty: z.enum(['never', 'sometimes', 'often'], { required_error: currentLang === 'ar' ? 'مطلوب' : 'Required' }),
+    hyperactivity: z.enum(['never', 'sometimes', 'often'], { required_error: currentLang === 'ar' ? 'مطلوب' : 'Required' }),
+    homework: z.enum(['yes', 'sometimes', 'no'], { required_error: currentLang === 'ar' ? 'مطلوب' : 'Required' }),
+    diet: z.enum(['excellent', 'good', 'average', 'poor'], { required_error: currentLang === 'ar' ? 'مطلوب' : 'Required' }),
+    vegetables: z.enum(['0', '1', '2+', '3+'], { required_error: currentLang === 'ar' ? 'مطلوب' : 'Required' }),
+    supplements: z.enum(['yes', 'no'], { required_error: currentLang === 'ar' ? 'مطلوب' : 'Required' }),
+    allergies: z.string().optional(),
+    medications: z.string().optional(),
+    notes: z.string().optional(),
+  }), [t, currentLang]);
+
   const form = useForm<AssessmentFormValues>({
-    resolver: zodResolver(assessmentSchema),
+    resolver: zodResolver(dynamicSchema),
     defaultValues: savedValues,
     mode: 'onChange',
   });
@@ -83,7 +111,7 @@ export function Assessment() {
 
   const handleNext = async () => {
     const fieldMap: Record<number, (keyof AssessmentFormValues)[]> = {
-      1: ['parentName', 'email', 'phone'],
+      1: ['parentName', 'email', 'phone', 'isParent'],
       2: ['childName', 'age', 'gender'],
       3: ['activityLevel', 'focusDifficulty', 'hyperactivity', 'homework'],
       4: ['diet', 'vegetables', 'supplements'],
@@ -96,11 +124,27 @@ export function Assessment() {
   const handlePrev = () => setCurrentStep((p) => Math.max(p - 1, 1));
 
   const onSubmit = (data: AssessmentFormValues) => {
-    submitAssessment.mutate({ data }, {
+    const { isParent, ...submitData } = data as any;
+    if (typeof submitData.phone === 'string') submitData.phone = submitData.phone.trim() || null;
+    if (typeof submitData.allergies === 'string') submitData.allergies = submitData.allergies.trim() || null;
+    if (typeof submitData.medications === 'string') submitData.medications = submitData.medications.trim() || null;
+    if (typeof submitData.notes === 'string') submitData.notes = submitData.notes.trim() || null;
+
+    submitAssessment.mutate({ data: submitData }, {
       onSuccess: (result) => {
         sessionStorage.removeItem('assessment-form');
         setLocation(`/results/${result.id}`);
       },
+      onError: (err: any) => {
+        console.error("Submission failed:", err);
+        toast({
+          variant: "destructive",
+          title: t.lang === 'ar' ? 'فشل إرسال التقييم' : 'Submission Failed',
+          description: err.message || (t.lang === 'ar' 
+            ? 'حدث خطأ أثناء الاتصال بالخادم. يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.' 
+            : 'Could not connect to the server. Please check your network and try again.'),
+        });
+      }
     });
   };
 
@@ -171,6 +215,24 @@ export function Assessment() {
                           <FormLabel>{a.phone}</FormLabel>
                           <FormControl><Input type="tel" placeholder={a.phonePlaceholder} {...field} value={field.value || ''} className="bg-background" /></FormControl>
                           <FormMessage />
+                        </FormItem>
+                      )} />
+                      <FormField control={form.control} name="isParent" render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-xl border p-4 bg-background select-none mt-4">
+                          <FormControl>
+                            <input
+                              type="checkbox"
+                              checked={!!field.value}
+                              onChange={(e) => field.onChange(e.target.checked)}
+                              className="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel className="cursor-pointer font-medium text-sm text-foreground/80">
+                              {t.lang === 'ar' ? 'أؤكد أنني والد أو ولي أمر هذا الطفل' : 'I confirm I am the parent or legal guardian of this child.'}
+                            </FormLabel>
+                            <FormMessage />
+                          </div>
                         </FormItem>
                       )} />
                     </div>
@@ -416,6 +478,13 @@ export function Assessment() {
                           <FormMessage />
                         </FormItem>
                       )} />
+                      <div className="mt-6 p-4 rounded-xl bg-muted/30 border border-border/60 text-center">
+                        <p className="text-[10.5px] md:text-[11.5px] text-foreground/50 leading-relaxed">
+                          {t.lang === 'ar' 
+                            ? 'خصوصيتك تهمنا. تُستخدم المعلومات التي يتم جمعها في هذا التقييم فقط لتقديم اقتراحات مخصصة لطفلك ويتم تخزينها بشكل آمن في قاعدة البيانات الخاصة بنا. نحن لا نبيع أو نشارك أو نكشف عن بيانات طفلك لأي خدمات خارجية أو برامج تتبع.' 
+                            : "Your privacy is important to us. The information collected in this assessment is used solely to generate child-specific wellness suggestions and is stored securely in our database. We do not sell, share, or disclose your child's data to any third-party services or analytics scripts."}
+                        </p>
+                      </div>
                     </div>
                   )}
 

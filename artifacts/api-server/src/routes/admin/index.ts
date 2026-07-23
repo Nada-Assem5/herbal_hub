@@ -1,6 +1,11 @@
 import { Router, type IRouter } from "express";
-import { eq, ilike, or, sql, count } from "drizzle-orm";
-import { db, assessmentsTable } from "@workspace/db";
+import {
+  getAllAssessments,
+  getAllAssessmentsSortedByDateDesc,
+  getAssessmentById,
+  deleteAssessmentById,
+  listAssessments,
+} from "@workspace/db";
 import {
   AdminLoginBody,
   AdminLoginResponse,
@@ -64,7 +69,7 @@ router.get("/admin/me", (req, res): void => {
 // ── Protected routes ─────────────────────────────────────────────────────────
 
 router.get("/admin/stats", requireAdmin, async (req, res): Promise<void> => {
-  const all = await db.select().from(assessmentsTable);
+  const all = await getAllAssessments();
 
   const totalAssessments = all.length;
   const focusCount = all.filter((a) => a.recommendation === "focus").length;
@@ -158,41 +163,12 @@ router.get(
     const { search, recommendation, page = 1, limit = 20 } = qp.data;
     const offset = (page - 1) * limit;
 
-    let query = db.select().from(assessmentsTable).$dynamic();
-    let countQuery = db
-      .select({ count: count() })
-      .from(assessmentsTable)
-      .$dynamic();
-
-    if (search) {
-      const like = `%${search}%`;
-      const searchFilter = or(
-        ilike(assessmentsTable.parentName, like),
-        ilike(assessmentsTable.email, like),
-        ilike(assessmentsTable.childName, like),
-      );
-      query = query.where(searchFilter);
-      countQuery = countQuery.where(searchFilter);
-    }
-
-    if (recommendation) {
-      query = query.where(
-        eq(assessmentsTable.recommendation, recommendation),
-      );
-      countQuery = countQuery.where(
-        eq(assessmentsTable.recommendation, recommendation),
-      );
-    }
-
-    const [totalResult, rows] = await Promise.all([
-      countQuery,
-      query
-        .orderBy(sql`${assessmentsTable.createdAt} desc`)
-        .limit(limit)
-        .offset(offset),
-    ]);
-
-    const total = totalResult[0]?.count ?? 0;
+    const { total, rows } = await listAssessments({
+      search,
+      recommendation,
+      page,
+      limit,
+    });
 
     res.json(
       ListAdminAssessmentsResponse.parse({
@@ -210,10 +186,7 @@ router.get(
   requireAdmin,
   async (req, res): Promise<void> => {
     const format = req.query["format"] === "xlsx" ? "xlsx" : "csv";
-    const rows = await db
-      .select()
-      .from(assessmentsTable)
-      .orderBy(sql`${assessmentsTable.createdAt} desc`);
+    const rows = await getAllAssessmentsSortedByDateDesc();
 
     const headers = [
       "ID",
@@ -274,8 +247,12 @@ router.get(
       .map((row) => row.map(escape).join(","))
       .join("\n");
 
-    const filename = format === "xlsx" ? "assessments.csv" : "assessments.csv";
-    res.setHeader("Content-Type", "text/csv");
+    const filename = format === "xlsx" ? "assessments.xlsx" : "assessments.csv";
+    const contentType =
+      format === "xlsx"
+        ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        : "text/csv";
+    res.setHeader("Content-Type", contentType);
     res.setHeader(
       "Content-Disposition",
       `attachment; filename="${filename}"`,
@@ -294,10 +271,7 @@ router.get(
       return;
     }
 
-    const [assessment] = await db
-      .select()
-      .from(assessmentsTable)
-      .where(eq(assessmentsTable.id, params.data.id));
+    const assessment = await getAssessmentById(params.data.id);
 
     if (!assessment) {
       res.status(404).json({ error: "Assessment not found" });
@@ -318,10 +292,7 @@ router.delete(
       return;
     }
 
-    const [deleted] = await db
-      .delete(assessmentsTable)
-      .where(eq(assessmentsTable.id, params.data.id))
-      .returning();
+    const deleted = await deleteAssessmentById(params.data.id);
 
     if (!deleted) {
       res.status(404).json({ error: "Assessment not found" });

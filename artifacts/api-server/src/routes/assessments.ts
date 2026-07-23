@@ -1,6 +1,5 @@
 import { Router, type IRouter } from "express";
-import { eq } from "drizzle-orm";
-import { db, assessmentsTable } from "@workspace/db";
+import { insertAssessment, getAssessmentById } from "@workspace/db";
 import {
   SubmitAssessmentBody,
   SubmitAssessmentResponse,
@@ -29,30 +28,27 @@ router.post("/assessments", async (req, res): Promise<void> => {
     supplements: input.supplements,
   });
 
-  const [assessment] = await db
-    .insert(assessmentsTable)
-    .values({
-      parentName: input.parentName,
-      email: input.email,
-      phone: input.phone ?? null,
-      childName: input.childName,
-      age: input.age,
-      gender: input.gender,
-      activityLevel: input.activityLevel,
-      focusDifficulty: input.focusDifficulty,
-      hyperactivity: input.hyperactivity,
-      homework: input.homework,
-      diet: input.diet,
-      vegetables: input.vegetables,
-      supplements: input.supplements,
-      allergies: input.allergies ?? null,
-      medications: input.medications ?? null,
-      notes: input.notes ?? null,
-      focusScore,
-      mineralScore,
-      recommendation,
-    })
-    .returning();
+  const assessment = await insertAssessment({
+    parentName: input.parentName,
+    email: input.email,
+    phone: input.phone ?? null,
+    childName: input.childName,
+    age: input.age,
+    gender: input.gender,
+    activityLevel: input.activityLevel,
+    focusDifficulty: input.focusDifficulty,
+    hyperactivity: input.hyperactivity,
+    homework: input.homework,
+    diet: input.diet,
+    vegetables: input.vegetables,
+    supplements: input.supplements,
+    allergies: input.allergies ?? null,
+    medications: input.medications ?? null,
+    notes: input.notes ?? null,
+    focusScore,
+    mineralScore,
+    recommendation,
+  });
 
   res.status(201).json(SubmitAssessmentResponse.parse(assessment));
 });
@@ -64,10 +60,7 @@ router.get("/assessments/:id", async (req, res): Promise<void> => {
     return;
   }
 
-  const [assessment] = await db
-    .select()
-    .from(assessmentsTable)
-    .where(eq(assessmentsTable.id, params.data.id));
+  const assessment = await getAssessmentById(params.data.id);
 
   if (!assessment) {
     res.status(404).json({ error: "Assessment not found" });

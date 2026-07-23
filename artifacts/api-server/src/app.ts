@@ -44,4 +44,8 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", router);
 
+app.get("/", (_req, res) => {
+  res.json({ status: "ok", service: "Pure Botanica API" });
+});
+
 export default app;
