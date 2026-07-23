@@ -22,7 +22,9 @@ if (userAgent && !userAgent.includes("pnpm")) {
 }
 
 // Sync closed and open jar product images
-const rootAssetDir = 'E:\\Nadod\\SkinType Classification';
+const localRootDir = 'E:\\Nadod\\SkinType Classification';
+const repoAssetsDir = path.resolve(process.cwd(), 'artifacts/pure-botanica/src/assets');
+const rootAssetDir = fs.existsSync(localRootDir) ? localRootDir : repoAssetsDir;
 
 const imageMap = [
   {

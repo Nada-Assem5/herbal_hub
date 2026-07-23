@@ -5,7 +5,9 @@ import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
 
 // Sync closed and open jar product images
-const rootAssetDir = 'E:\\Nadod\\SkinType Classification';
+const localRootDir = 'E:\\Nadod\\SkinType Classification';
+const repoAssetsDir = path.resolve(import.meta.dirname, 'src/assets');
+const rootAssetDir = fs.existsSync(localRootDir) ? localRootDir : repoAssetsDir;
 
 const imageMap = [
   {
