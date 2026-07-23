@@ -6,7 +6,7 @@ import {
   GetAssessmentParams,
   GetAssessmentResponse,
 } from "@workspace/api-zod";
-import { score } from "../lib/scoring";
+import { score } from "../lib/scoring.js";
 
 const router: IRouter = Router();
 
