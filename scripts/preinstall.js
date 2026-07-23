@@ -1,13 +1,14 @@
 import fs from "fs";
 import path from "path";
 
-// Delete package-lock.json and yarn.lock from the workspace root if they exist
-const filesToDelete = ["package-lock.json", "yarn.lock"];
+// Delete package-lock.json, yarn.lock, root vercel.json, and root api/index.ts from workspace root if they exist
+const filesToDelete = ["package-lock.json", "yarn.lock", "vercel.json", "api/index.ts"];
 for (const file of filesToDelete) {
   const filePath = path.resolve(process.cwd(), file);
   if (fs.existsSync(filePath)) {
     try {
       fs.unlinkSync(filePath);
+      console.log(`Removed root file: ${file}`);
     } catch (err) {
       console.error(`Failed to delete ${file}:`, err);
     }
