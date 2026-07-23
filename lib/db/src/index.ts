@@ -119,6 +119,10 @@ export async function insertAssessment(input: InsertAssessment): Promise<Assessm
     const id = list.length > 0 ? Math.max(...list.map((a) => a.id)) + 1 : 1;
     const newAssessment: Assessment = {
       ...input,
+      phone: input.phone ?? null,
+      allergies: input.allergies ?? null,
+      medications: input.medications ?? null,
+      notes: input.notes ?? null,
       id,
       createdAt: new Date(),
     };

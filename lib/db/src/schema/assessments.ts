@@ -28,7 +28,7 @@ export interface Assessment {
   id: number;
   parentName: string;
   email: string;
-  phone: string | null;
+  phone?: string | null;
   childName: string;
   age: number;
   gender: string;
@@ -39,9 +39,9 @@ export interface Assessment {
   diet: string;
   vegetables: string;
   supplements: string;
-  allergies: string | null;
-  medications: string | null;
-  notes: string | null;
+  allergies?: string | null;
+  medications?: string | null;
+  notes?: string | null;
   focusScore: number;
   mineralScore: number;
   recommendation: string;
