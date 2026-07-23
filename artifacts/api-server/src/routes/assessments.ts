@@ -10,7 +10,7 @@ import { score } from "../lib/scoring.js";
 
 const router = Router();
 
-router.post("/assessments", async (req, res): Promise<void> => {
+router.post("/assessments", async (req: any, res: any): Promise<void> => {
   const parsed = SubmitAssessmentBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -53,7 +53,7 @@ router.post("/assessments", async (req, res): Promise<void> => {
   res.status(201).json(SubmitAssessmentResponse.parse(assessment));
 });
 
-router.get("/assessments/:id", async (req, res): Promise<void> => {
+router.get("/assessments/:id", async (req: any, res: any): Promise<void> => {
   const params = GetAssessmentParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
