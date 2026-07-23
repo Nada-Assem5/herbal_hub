@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { type Assessment, type InsertAssessment } from "./schema";
+import { type Assessment, type InsertAssessment } from "./schema.js";
 
 const DB_FILE = process.env.JSON_DB_PATH || path.join(process.cwd(), "db.json");
 
@@ -184,4 +184,4 @@ export async function listAssessments(params: {
   return { total, rows };
 }
 
-export * from "./schema";
+export * from "./schema.js";
