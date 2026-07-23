@@ -1,31 +1,31 @@
-import express, { type Express } from "express";
+import express from "express";
 import cors from "cors";
 import pinoHttp from "pino-http";
 import session from "express-session";
 import router from "./routes";
 import { logger } from "./lib/logger";
 
-const app: Express = express();
+const app: any = express();
 
-app.use(
-  pinoHttp({
-    logger,
-    serializers: {
-      req(req) {
-        return {
-          id: req.id,
-          method: req.method,
-          url: req.url?.split("?")[0],
-        };
-      },
-      res(res) {
-        return {
-          statusCode: res.statusCode,
-        };
-      },
+const pinoMiddleware = (pinoHttp as any)({
+  logger,
+  serializers: {
+    req(req: any) {
+      return {
+        id: req.id,
+        method: req.method,
+        url: req.url?.split("?")[0],
+      };
     },
-  }),
-);
+    res(res: any) {
+      return {
+        statusCode: res.statusCode,
+      };
+    },
+  },
+});
+
+app.use(pinoMiddleware);
 app.use(cors({ origin: true, credentials: true }));
 app.use(
   session({
@@ -44,7 +44,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", router);
 
-app.get("/", (_req, res) => {
+app.get("/", (_req: any, res: any) => {
   res.json({ status: "ok", service: "Pure Botanica API" });
 });
 
