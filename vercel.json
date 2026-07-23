@@ -1,7 +1,7 @@
 {
-  "version": 2,
   "buildCommand": "pnpm --filter @workspace/pure-botanica build",
   "outputDirectory": "artifacts/pure-botanica/dist",
+  "framework": "vite",
   "rewrites": [
     {
       "source": "/api/(.*)",
