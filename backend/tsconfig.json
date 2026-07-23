@@ -14,13 +14,5 @@
   "include": [
     "src",
     "api"
-  ],
-  "references": [
-    {
-      "path": "../packages/db"
-    },
-    {
-      "path": "../packages/api-zod"
-    }
   ]
 }

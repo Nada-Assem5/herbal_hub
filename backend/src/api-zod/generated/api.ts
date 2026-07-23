@@ -222,5 +222,3 @@ export const DeleteAdminAssessmentParams = zod.object({
 })
 
 export const DeleteAdminAssessmentResponse = zod.void()
-
-

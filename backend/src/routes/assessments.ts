@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { insertAssessment, getAssessmentById } from "@workspace/db";
+import { insertAssessment, getAssessmentById } from "../db/index.js";
 import {
   SubmitAssessmentBody,
   SubmitAssessmentResponse,
   GetAssessmentParams,
   GetAssessmentResponse,
-} from "@workspace/api-zod";
+} from "../api-zod/index.js";
 import { score } from "../lib/scoring.js";
 
 const router = Router();

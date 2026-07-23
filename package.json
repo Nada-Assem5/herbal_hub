@@ -6,14 +6,12 @@
   "workspaces": [
     "backend",
     "frontend",
-    "packages/*",
     "scripts"
   ],
   "scripts": {
     "preinstall": "node scripts/preinstall.js",
     "build": "npm run typecheck && npm run build --workspaces --if-present",
-    "typecheck:libs": "tsc --build",
-    "typecheck": "npm run typecheck:libs && npm run typecheck --workspaces --if-present"
+    "typecheck": "npm run typecheck --workspaces --if-present"
   },
   "devDependencies": {
     "prettier": "^3.9.5",

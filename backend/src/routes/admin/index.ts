@@ -5,7 +5,7 @@ import {
   getAssessmentById,
   deleteAssessmentById,
   listAssessments,
-} from "@workspace/db";
+} from "../../db/index.js";
 import {
   AdminLoginBody,
   AdminLoginResponse,
@@ -16,7 +16,7 @@ import {
   GetAdminAssessmentParams,
   GetAdminAssessmentResponse,
   DeleteAdminAssessmentParams,
-} from "@workspace/api-zod";
+} from "../../api-zod/index.js";
 
 const router = Router();
 

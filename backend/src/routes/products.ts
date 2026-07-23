@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getProducts } from "@workspace/db";
+import { getProducts } from "../db/index.js";
 
 const router = Router();
 
