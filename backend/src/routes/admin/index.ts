@@ -56,9 +56,13 @@ router.post("/admin/login", async (req: any, res: any): Promise<void> => {
 });
 
 router.post("/admin/logout", (req: any, res: any): void => {
-  req.session.destroy(() => {
+  if (req.session) {
+    req.session.destroy(() => {
+      res.json({ authenticated: false });
+    });
+  } else {
     res.json({ authenticated: false });
-  });
+  }
 });
 
 router.get("/admin/me", (req: any, res: any): void => {
@@ -232,7 +236,7 @@ router.get(
       r.focusScore,
       r.mineralScore,
       r.recommendation,
-      r.createdAt.toISOString(),
+      new Date(r.createdAt).toISOString(),
     ]);
 
     const escape = (v: unknown) => {

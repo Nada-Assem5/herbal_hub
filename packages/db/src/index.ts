@@ -57,9 +57,16 @@ function loadEnv() {
 let connectionPromise: Promise<typeof mongoose> | null = null;
 
 export async function connectDB(): Promise<void> {
-  if (connectionPromise) {
-    await connectionPromise;
+  if (mongoose.connection.readyState === 1) {
     return;
+  }
+  if (connectionPromise) {
+    try {
+      await connectionPromise;
+      return;
+    } catch {
+      connectionPromise = null;
+    }
   }
   loadEnv();
   const uri = process.env["MONGODB_URI"];
@@ -71,6 +78,9 @@ export async function connectDB(): Promise<void> {
   connectionPromise = mongoose.connect(uri, {
     dbName: "herbalhub",
     serverSelectionTimeoutMS: 10_000,
+  }).catch((err) => {
+    connectionPromise = null;
+    throw err;
   });
   await connectionPromise;
 }

@@ -6,6 +6,7 @@ import router from "./routes/index.js";
 import { logger } from "./lib/logger.js";
 
 const app: any = express();
+app.set("trust proxy", 1);
 
 const pinoMiddleware = (pinoHttp as any)({
   logger,
