@@ -16,7 +16,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { useSubmitAssessment } from '@workspace/api-client-react';
+import { useSubmitAssessment } from '@/api-client';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
 import botanicalBg from '@assets/generated_images/botanical-bg.png';

@@ -6,8 +6,8 @@ import {
   useListAdminAssessments,
   useDeleteAdminAssessment,
   useAdminLogout,
-  getListAdminAssessmentsQueryKey
-} from '@workspace/api-client-react';
+  getListAdminAssessmentsQueryKey,
+} from '@/api-client';
 import { useQueryClient } from '@tanstack/react-query';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,

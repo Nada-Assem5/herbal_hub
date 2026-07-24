@@ -1,5 +1,5 @@
 import { useParams, Link } from 'wouter';
-import { useGetAssessment } from '@workspace/api-client-react';
+import { useGetAssessment } from '@/api-client';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';

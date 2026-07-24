@@ -14,7 +14,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { useAdminLogin } from '@workspace/api-client-react';
+import { useAdminLogin } from '@/api-client';
 import { Lock, Loader2, Leaf } from 'lucide-react';
 import botanicalBg from '@assets/botanical-bg.png';
 
